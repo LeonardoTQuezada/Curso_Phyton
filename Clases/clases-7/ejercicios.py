@@ -30,3 +30,53 @@
 # Aplícalo a tres funciones distintas que hagan cálculos pesados (ej: fibonacci recursivo,
 # ordenar listas grandes, contar frecuencias de letras en texto largo).
 # Compara los tiempos con y sin lru_cache para la función de fibonacci.
+
+
+# Ejercicio de fechas:
+ 
+# Crear una función que nos permita calcular cuantos días quedan hasta nuestro aniversario 
+# (si no tenemos aniversario, hasta san valentin)
+ 
+# si quedan menos de 10 días, debería apurarnos a comprar un regalo y a preparar algo especial!
+
+# ademas, crear una segunda función que nos permita cambiar cuando es nuestro aniversario (o dia de san valentin)
+ 
+# truco: tendremos que usar correctamente el scope y tendremos que tener un bucle para que el usuario vaya jugando con las fechas)
+ 
+# from datetime import datetime, date
+
+# def dias_hasta_aniversario(aniversario=None):
+#     nombre = "tu aniversario"
+#     if not aniversario:
+#         aniversario = date(date.today().year + 1, 2, 14)  
+#         nombre = f"San Valentín"
+#     else:
+#         aniversario = datetime.strptime(aniversario, "%d/%m/%Y").date()
+       
+#     hoy = date.today()
+#     dias = (aniversario - hoy).days
+
+#     return nombre, dias
+
+# def cambiar_aniversario():
+#     while True:
+#         nombre, dias = dias_hasta_aniversario()
+        
+#         nueva_fecha = input("Introduce la nueva fecha (DD/MM/YYYY), Enter para San Valentín o 'salir': ").strip()
+#         if nueva_fecha.lower() == 'salir':
+#             break
+#         try:
+#             nombre, dias_restantes = dias_hasta_aniversario(nueva_fecha)
+
+#             if dias_restantes < 0:
+#                 print("Esa fecha ya ha pasado. Introduce una fecha futura.")
+#             else:
+#                 print(f"Quedan {dias_restantes} días hasta {nombre}.")
+#                 if dias_restantes < 10:
+#                     print("¡Apúrate a comprar un regalo y a preparar algo especial!")
+                    
+#         except ValueError:
+#             print("Formato de fecha incorrecto. Por favor, usa DD/MM/YYYY.")
+
+
+# cambiar_aniversario() 
