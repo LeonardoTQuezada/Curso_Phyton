@@ -27,3 +27,88 @@
 # comprensión de diccionario para: convertir las claves a snake_case (minúsculas
 # con guiones bajos en lugar de espacios) y excluir claves que empiecen por "_".
 # Ejemplo: {"Nombre Completo": "Ana", "_id": 1} -> {"nombre_completo": "Ana"}
+
+# Ejercicio
+# from pathlib import Path
+
+# class FiltroLogs:
+
+#     def __init__(self, archivo, keyword):
+#         self.archivo = Path(archivo)
+#         self.keyword = keyword.upper()
+#         self.fichero = None
+
+#     def __iter__(self):
+#         self.fichero = self.archivo.open("r")
+#         return self
+
+#     def __next__(self):
+
+#         for linea in self.fichero:
+
+#             if self.keyword in linea.upper():
+#                 return linea.strip()
+
+#         self.fichero.close()
+#         raise StopIteration
+
+
+# menu = '''Introduce para filtrar los logs: 
+#            1- ERROR
+#            2- WARNING
+#            3 - INFO
+#            4 - Salir\n '''
+# while True:
+    
+#     valor = int(input(menu))
+    
+    
+
+#     match valor:
+#         case 1:
+#             keyword = "ERROR"
+#         case 2:
+#             keyword = "WARNING"
+#         case 3:
+#             keyword = "INFO"
+#         case 4:
+#             break
+#         case _:
+#             print("Valor no válido")
+#             continue
+
+#     logs = FiltroLogs("log.log", keyword)
+
+#     for log in logs:
+#         print(log)
+
+# Ejercicio Como repaso:
+ 
+# Crear un iterador al que yo le de una clase Alumno y me devuelva una a una sus notas, 
+# que deberían ser una lista de notas en el alumno 
+class Alumno:
+    def __init__(self, nombre, notas):
+        self.nombre = nombre
+        self.notas = notas
+
+ 
+class IteradorNotas:
+    def __init__(self, alumno):
+        self.alumno = alumno
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index < len(self.alumno.notas):
+            nota = self.alumno.notas[self.index]
+            self.index += 1
+            return nota
+        else:
+            raise StopIteration
+ 
+
+alumno = Alumno("Juan", [7, 8, 9, 10])
+for nota in IteradorNotas(alumno):
+    print(nota)
