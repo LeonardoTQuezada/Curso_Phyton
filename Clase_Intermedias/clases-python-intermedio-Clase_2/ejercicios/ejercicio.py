@@ -270,67 +270,189 @@
  
 # debería estar esto en la interfaz? en las formas de notificación? en el gestor de notificaciones?
  
-from abc import ABC, abstractmethod
+# from abc import ABC, abstractmethod
 
-class Notificador(ABC):
+# class Notificador(ABC):
+#     @abstractmethod
+#     def enviar_notificacion(self, mensaje):
+#         pass
+
+# class NotificadorWhatsApp(Notificador):
+#     def enviar_notificacion(self, mensaje):
+#         print(f"Enviando notificación por WhatsApp: {mensaje}")
+
+# class NotificadorEmail(Notificador):
+#     def enviar_notificacion(self, mensaje):
+#         print(f"Enviando notificación por Email: {mensaje}")
+
+# class NotificadorSMS(Notificador):
+#     def enviar_notificacion(self, mensaje):
+#         print(f"Enviando notificación por SMS: {mensaje}")
+
+# class AppComida:
+#     def __init__(self, notificador):
+#         self.notificador = notificador
+
+#     def realizar_pedido(self, pedido):
+#         print(f"Pedido realizado: {pedido}")
+#         self.notificador.enviar_notificacion(f"Tu pedido '{pedido}' ha sido realizado.")
+
+#     def cambiar_notificador(self, nuevo_notificador):
+#         self.notificador = nuevo_notificador
+#         print(f"Notificador cambiado a: {type(nuevo_notificador).__name__} ")
+
+#     def pedido_saliendo(self, pedido):
+#         print(f"Pedido saliendo: {pedido}")
+#         self.notificador.enviar_notificacion(f"Tu pedido '{pedido}' está saliendo.")
+
+#     def pago(self, pedido, metodo_pago):
+#         print(f"Procesando pago para el pedido: {pedido}")
+#         metodo_pago(pedido) 
+
+# class SistemaPago:
+#     @staticmethod
+#     def pago_tarjeta(pedido):
+#         print(f"Pago con tarjeta procesado para el pedido: {pedido}")
+
+#     @staticmethod
+#     def pago_paypal(pedido):
+#         print(f"Pago con PayPal procesado para el pedido: {pedido}")
+
+
+# # Ejemplo de uso
+# notificador_whatsapp = NotificadorWhatsApp()
+# notificador_email = NotificadorEmail()
+# notificador_sms = NotificadorSMS()
+
+# app = AppComida(notificador_whatsapp)
+# app.realizar_pedido("Pizza Margherita")
+# app.pago("Pizza Margherita", SistemaPago.pago_tarjeta)
+# app.pedido_saliendo("Pizza Margherita")
+
+# print("\nCambiando notificador a Email...\n")
+# app.cambiar_notificador(notificador_email)
+# app.realizar_pedido("Sushi")
+# app.pago("Sushi", SistemaPago.pago_paypal)
+# app.pedido_saliendo("Sushi")
+
+# Ejercicio de serialización y deserialización de objetos
+# Serializar
+
+#  OBJECTO ----> texto
+#  dump()
+
+# Deserializar
+
+#  texto ----> OBJETO
+#  load()
+
+# import json
+# from datetime import datetime
+
+# with open("mi_json.json", "r") as _json:
+#     data = json.load(_json)
+
+
+# class Usuario:
+#     def __init__(self, usuario, contraseña, email, creacion, id):
+#         self.usuario = usuario
+#         self.contraseña = contraseña
+#         self.email = email
+#         self.creacion = creacion
+#         self._id = id
+
+# # data tiene mi json deserializado!
+# usuario = Usuario(**data)
+# print(usuario.email)
+ 
+
+# Ejercicio: para acplicar los principios SOLID
+
+ 
+# Hacer un gestor de mensajes, que pueda manejar mensajes (tanto enviar como recibir), por otra parte, tenemos que tener mensajes que se 
+# puedan gestionar como txt, y mensajes que se puedan gestionar como json
+ 
+# Lo que el usuario tendrá es o bien un json o txt, y tendremos que conseguir que eso sea un mensaje, y que la info este en un objeto
+ 
+# O bien al contrario, un mensaje de uno de esos dos tipos, y que se convierta en un json o txt
+ 
+# Todo a través del gestor!
+ 
+# Puntos extra si dividimos un poco el código en varios módulos!
+ 
+# Por cierto, el código debería de poder adaptar fácilmente otro tipo de mensajes (SMS, email, HTML, etc...)
+
+from abc import ABC, abstractmethod
+import json
+
+class Mensaje:
+    def __init__(self, remitente, destinatario, contenido):
+        self.remitente = remitente
+        self.destinatario = destinatario
+        self.contenido = contenido
+
+
+class FormatoMensaje(ABC):
     @abstractmethod
-    def enviar_notificacion(self, mensaje):
+    def exportar(self, mensaje):
         pass
 
-class NotificadorWhatsApp(Notificador):
-    def enviar_notificacion(self, mensaje):
-        print(f"Enviando notificación por WhatsApp: {mensaje}")
+    @abstractmethod
+    def importar(self, data):
+        pass
 
-class NotificadorEmail(Notificador):
-    def enviar_notificacion(self, mensaje):
-        print(f"Enviando notificación por Email: {mensaje}")
+class FormatoJSON(FormatoMensaje):
+    def exportar(self, mensaje):
+        return json.dumps({
+            "remitente": mensaje.remitente,
+            "destinatario": mensaje.destinatario,
+            "contenido": mensaje.contenido
+        }, ensure_ascii=False, indent=4)
+    
 
-class NotificadorSMS(Notificador):
-    def enviar_notificacion(self, mensaje):
-        print(f"Enviando notificación por SMS: {mensaje}")
+    def importar(self, data):
+        data_dict = json.loads(data)
+        return Mensaje(data_dict["remitente"], data_dict["destinatario"], data_dict["contenido"])   
 
-class AppComida:
-    def __init__(self, notificador):
-        self.notificador = notificador
+class FormatoTXT(FormatoMensaje):
+    def exportar(self, mensaje):
+        return f"{mensaje.remitente},{mensaje.destinatario},{mensaje.contenido}"
 
-    def realizar_pedido(self, pedido):
-        print(f"Pedido realizado: {pedido}")
-        self.notificador.enviar_notificacion(f"Tu pedido '{pedido}' ha sido realizado.")
+    def importar(self, data):
+        remitente, destinatario, contenido = data.split(",", 2)
+        return Mensaje(remitente, destinatario, contenido)
 
-    def cambiar_notificador(self, nuevo_notificador):
-        self.notificador = nuevo_notificador
-        print(f"Notificador cambiado a: {type(nuevo_notificador).__name__} ")
+class GestorMensajes:
+    def __init__(self, formato: FormatoMensaje):
+        self.formato = formato
 
-    def pedido_saliendo(self, pedido):
-        print(f"Pedido saliendo: {pedido}")
-        self.notificador.enviar_notificacion(f"Tu pedido '{pedido}' está saliendo.")
+    def enviar_mensaje(self, mensaje: Mensaje):
+        data_serializada = self.formato.exportar(mensaje)
+        print(f"Enviando mensaje: {data_serializada}")
+        return data_serializada
 
-    def pago(self, pedido, metodo_pago):
-        print(f"Procesando pago para el pedido: {pedido}")
-        metodo_pago(pedido) 
-
-class SistemaPago:
-    @staticmethod
-    def pago_tarjeta(pedido):
-        print(f"Pago con tarjeta procesado para el pedido: {pedido}")
-
-    @staticmethod
-    def pago_paypal(pedido):
-        print(f"Pago con PayPal procesado para el pedido: {pedido}")
-
+    def recibir_mensaje(self, data):
+        mensaje = self.formato.importar(data)
+        print(f"Mensaje recibido de {mensaje.remitente} a {mensaje.destinatario}: {mensaje.contenido}")
+        return mensaje
 
 # Ejemplo de uso
-notificador_whatsapp = NotificadorWhatsApp()
-notificador_email = NotificadorEmail()
-notificador_sms = NotificadorSMS()
+gestorJson = GestorMensajes(FormatoJSON())
+mensaje = Mensaje("Ana", "Luis", "Hola Luis, ¿quedamos?")
 
-app = AppComida(notificador_whatsapp)
-app.realizar_pedido("Pizza Margherita")
-app.pago("Pizza Margherita", SistemaPago.pago_tarjeta)
-app.pedido_saliendo("Pizza Margherita")
+print("**** Objeto -> JSON ****")
+texto_json = gestorJson.enviar_mensaje(mensaje)
+print(type(texto_json))
 
-print("\nCambiando notificador a Email...\n")
-app.cambiar_notificador(notificador_email)
-app.realizar_pedido("Sushi")
-app.pago("Sushi", SistemaPago.pago_paypal)
-app.pedido_saliendo("Sushi")
+print("\n**** JSON -> Objeto ****")
+msg = gestorJson.recibir_mensaje(texto_json)
+print(type(msg))
+
+print("\n**** Objeto -> TXT ****")
+gestorTxt = GestorMensajes(FormatoTXT())
+texto_txt = gestorTxt.enviar_mensaje(mensaje)
+print(type(texto_txt))
+
+print("\n**** TXT -> Objeto ****")
+msg = gestorTxt.recibir_mensaje("Elena,Juan,Hola Juan, ¿cómo estás?")
+print(type(msg))
